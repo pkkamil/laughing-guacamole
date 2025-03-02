@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/app/
+    links:
+      - php
+    networks:
+      - pg-network
+  
+  db:
+    build:
+      context: .
+      dockerfile: docker/db/Dockerfile
+    ports:
+      - "5433:5432"
+    networks:
+      - pg-network
+  
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    volumes:
+      - .:/app
+    networks:
+      - pg-network
+  
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pg-admin2
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    networks:
+      - pg-network
+  
+networks:
+  pg-network:
+
+volumes:
+  pg-data:
