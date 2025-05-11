@@ -19,6 +19,11 @@ $migrationsPath = __DIR__ . '/migrations';
 $files = scandir($migrationsPath);
 $executed = 0;
 
+// Sort the files by name to ensure the migrations run in the correct order
+usort($files, function ($a, $b) {
+    return strcmp($a, $b);
+});
+
 foreach ($files as $file) {
     if (pathinfo($file, PATHINFO_EXTENSION) !== 'php') continue;
 

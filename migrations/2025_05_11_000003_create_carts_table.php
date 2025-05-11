@@ -2,10 +2,11 @@
 
 $db->exec("
     CREATE TABLE IF NOT EXISTS carts (
-        id SERIAL PRIMARY KEY,
-        user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
-        status VARCHAR(50) DEFAULT 'active',
+        id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        user_id INT UNSIGNED,
+        status VARCHAR(50) DEFAULT 'active',
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
     );
 ");

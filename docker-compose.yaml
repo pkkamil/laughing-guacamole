@@ -21,13 +21,14 @@ services:
       - .:/app/
 
   db:
-    image: postgres:latest
+    image: mariadb:latest
     restart: always
     environment:
-      - POSTGRES_DB=${DB_NAME}
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
     ports:
-      - 5432:5432
+      - 3306:3306
     volumes:
-      - ./docker/postgres/:/docker-entrypoint-initdb.d/
+      - ./docker/mariadb/:/docker-entrypoint-initdb.d/
