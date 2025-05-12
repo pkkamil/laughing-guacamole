@@ -1,8 +1,8 @@
 <?php
 $title = "Logowanie";
-$lazy = true;
 
-// Symulacja błędów i starych danych
+global $errors, $old;
+
 $errors = $_SESSION['errors'] ?? [];
 $old = $_SESSION['old'] ?? [];
 
@@ -31,9 +31,6 @@ function errorMessage($key)
     <section class="auth__box">
         <h2>Logowanie</h2>
         <form method="POST" action="login" class="auth__box__form">
-            <!-- CSRF -->
-            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
-
             <label for="email" class="auth__box__form__input">
                 <input type="email" name="email" id="email" placeholder="Adres email"
                     class="<?= errorClass('email') ?>"

@@ -1,12 +1,11 @@
 <?php
 $title = "Rejestracja";
-$lazy = true;
 
-// Symulacja błędów i starych danych (zazwyczaj pochodzi z walidacji po POST)
+global $errors, $old;
+
 $errors = $_SESSION['errors'] ?? [];
 $old = $_SESSION['old'] ?? [];
 
-// Wyczyść sesję błędów po użyciu
 unset($_SESSION['errors'], $_SESSION['old']);
 
 function old($key)
@@ -31,24 +30,24 @@ function errorMessage($key)
 <article class="auth">
     <section class="auth__box">
         <h2>Rejestracja</h2>
-        <form method="POST" action="register.php" class="auth__box__form">
+        <form method="POST" action="register" class="auth__box__form">
             <!-- CSRF token -->
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
 
             <div class="auth__box__form__two">
-                <label for="name" class="auth__box__form__two__input-small">
-                    <input type="text" name="name" id="name" placeholder="Imię"
-                        class="<?= errorClass('name') ?>"
-                        value="<?= old('name') ?>" required autofocus>
+                <label for="firstName" class="auth__box__form__two__input-small">
+                    <input type="text" name="firstName" id="firstName" placeholder="Imię"
+                        class="<?= errorClass('firstName') ?>"
+                        value="<?= old('firstName') ?>" required autofocus>
                 </label>
-                <label for="surname" class="auth__box__form__two__input-small">
-                    <input type="text" name="surname" id="surname" placeholder="Nazwisko"
-                        class="<?= errorClass('surname') ?>"
-                        value="<?= old('surname') ?>" required>
+                <label for="lastName" class="auth__box__form__two__input-small">
+                    <input type="text" name="lastName" id="lastName" placeholder="Nazwisko"
+                        class="<?= errorClass('lastName') ?>"
+                        value="<?= old('lastName') ?>" required>
                 </label>
             </div>
-            <?= errorMessage('name') ?>
-            <?= errorMessage('surname') ?>
+            <?= errorMessage('firstName') ?>
+            <?= errorMessage('lastName') ?>
 
             <label for="email" class="auth__box__form__input">
                 <input type="email" name="email" id="email" placeholder="Adres email"
@@ -62,8 +61,8 @@ function errorMessage($key)
                     class="<?= errorClass('password') ?>" required autocomplete="new-password">
             </label>
 
-            <label for="password_confirmation" class="auth__box__form__input">
-                <input type="password" name="password_confirmation" id="password_confirmation" placeholder="Potwierdzenie hasła"
+            <label for="confirmedPassword" class="auth__box__form__input">
+                <input type="password" name="confirmedPassword" id="confirmedPassword" placeholder="Potwierdzenie hasła"
                     class="<?= errorClass('password') ?>" required autocomplete="new-password">
             </label>
             <?= errorMessage('password') ?>

@@ -2,48 +2,72 @@
 
 require_once 'AppController.php';
 require_once __DIR__ . '/../models/User.php';
-require_once __DIR__ . '/../repository/UserRepository.php';
+require_once __DIR__ . '/../repositories/UserRepository.php';
+require_once __DIR__ . '/../repositories/AuthTokenRepository.php';
 
 class SecurityController extends AppController
 {
-    private $userRepository;
+    private UserRepository $userRepository;
+    private AuthTokenRepository $authTokenRepository;
 
     public function __construct()
     {
         parent::__construct();
         $this->userRepository = new UserRepository();
+        $this->authTokenRepository = new AuthTokenRepository();
     }
+
+    // TODO: Add LoginRequest
+    // TODO: Add DefaultResource
 
     public function login()
     {
-        if (!$this->isPost()) {
-            return $this->render('/auth/login');
-        }
-
-        // if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token'])) {
-        //     // Nieprawidłowy token CSRF
-        //     die('Błąd CSRF: nieprawidłowy token.');
-        // }
+        if (!$this->isPost()) return $this->render('/auth/login');
 
         $email = $_POST['email'];
-        $password = md5($_POST['password']);
+        $password = $_POST['password'];
 
         $user = $this->userRepository->getUser($email);
 
-        if (!$user) {
-            return $this->render('login', ['messages' => ['User not found!']]);
+        $errors = [];
+        $old = $_POST;
+
+        if (!$user || !password_verify($password, $user->getPassword())) $errors['password'] = 'Nieprawidłowe hasło.';
+
+        if (empty($errors)) {
+            $_SESSION['user'] = $user;
+
+            if (!empty($_POST['remember'])) {
+                // Clear old tokens
+                $this->authTokenRepository->deleteByUserId($user->getId());
+
+                // Generate selector + validator
+                $selector = bin2hex(random_bytes(8));
+                $validator = bin2hex(random_bytes(32));
+                $hashedValidator = hash('sha256', $validator);
+                $expires = (new DateTime('+30 days'));
+
+                // Save token to the database
+                $this->authTokenRepository->create(
+                    $user->getId(),
+                    $selector,
+                    $hashedValidator,
+                    $expires
+                );
+
+                // Set cookie
+                $cookieValue = "$selector:$validator";
+                setcookie('remember_me', $cookieValue, time() + 3600 * 24 * 30, '/', '', false, true); // HTTPOnly
+            }
+
+            header('Location: /account');
+            exit;
         }
 
-        if ($user->getEmail() !== $email) {
-            return $this->render('login', ['messages' => ['User with this email not exist!']]);
-        }
+        $_SESSION['errors'] = $errors;
+        $_SESSION['old'] = $old;
 
-        if ($user->getPassword() !== $password) {
-            return $this->render('login', ['messages' => ['Wrong password!']]);
-        }
-
-        $url = "http://$_SERVER[HTTP_HOST]";
-        header("Location: {$url}/projects");
+        return $this->render('/auth/login');
     }
 
     public function register()
@@ -56,14 +80,46 @@ class SecurityController extends AppController
         $firstName = $_POST['firstName'];
         $lastName = $_POST['lastName'];
 
-        if ($password !== $confirmedPassword) return $this->render('register', ['messages' => ['Please provide proper password']]);
+        $errors = [];
+        $old = $_POST;
 
-        //TODO try to use better hash function
-        $user = new User($email, md5($password), $firstName, $lastName);
+        // Walidacja hasła
+        if ($password !== $confirmedPassword) {
+            $errors['password'] = 'Hasła muszą się zgadzać.';
+        }
 
+        // Sprawdzenie, czy e-mail już istnieje
+        $existingUser = $this->userRepository->getUser($email);
+        if ($existingUser) {
+            $errors['email'] = 'Użytkownik o tym adresie e-mail już istnieje.';
+        }
+
+        // Walidacja danych
+        if (empty($firstName)) $errors['firstName'] = 'Imię jest wymagane.';
+        if (empty($lastName)) $errors['lastName'] = 'Nazwisko jest wymagane.';
+        if (empty($email)) $errors['email'] = 'E-mail jest wymagany.';
+        if (empty($password)) $errors['password'] = 'Hasło jest wymagane.';
+
+        // Jeśli są błędy, zwróć formularz z błędami
+        if (!empty($errors)) {
+            $_SESSION['errors'] = $errors;
+            $_SESSION['old'] = $old;
+            return $this->render('/auth/register');
+        }
+
+        // Utworzenie nowego użytkownika
+        $user = new User(
+            email: $email,
+            password: password_hash($password, PASSWORD_DEFAULT),
+            firstName: $firstName,
+            lastName: $lastName
+        );
+
+        // Dodanie użytkownika do bazy danych
         $this->userRepository->addUser($user);
 
-        return $this->render('login', ['messages' => ['You\'ve been succesfully registrated!']]);
+        // Przekierowanie do logowania po zarejestrowaniu
+        return $this->render('/auth/login', ['messages' => ['Rejestracja zakończona sukcesem. Możesz się teraz zalogować.']]);
     }
 
     public function reset()
