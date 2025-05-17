@@ -1,8 +1,8 @@
 <?php
 $title = "Resetowanie hasła";
-$lazy = true;
 
-// Symulacja błędów i starych danych
+global $errors, $old;
+
 $errors = $_SESSION['errors'] ?? [];
 $old = $_SESSION['old'] ?? [];
 
@@ -27,10 +27,11 @@ function errorMessage($key)
 }
 ?>
 
+
 <article class="auth">
     <section class="auth__box">
         <h2>Resetowanie hasła</h2>
-        <form method="POST" action="reset.php" class="auth__box__form">
+        <form method="POST" action="reset" class="auth__box__form">
             <!-- CSRF -->
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
 

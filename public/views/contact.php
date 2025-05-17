@@ -1,46 +1,48 @@
 <?php
 $title = "Kontakt";
-$lazy = true;
 
-// Przykładowy użytkownik zalogowany (np. z sesji)
-// $user = [
-//     'name' => 'Jan',
-//     'surname' => 'Kowalski',
-//     'email' => 'jan.kowalski@example.com',
-//     'telephone' => '123456789'
-// ];
-
-// Jeśli użytkownik nie jest zalogowany, $user może być null
+$errors = $errors ?? [];
 $isLoggedIn = isset($user);
+
+function old($key)
+{
+    global $old;
+    return htmlspecialchars($old[$key] ?? '');
+}
 ?>
 
 <article class="contact">
     <section class="contact__box">
         <h2>Skontaktuj się z nami!</h2>
-        <form action="" method="POST" autocomplete="off" class="contact__box__form">
-            <label for="name" class="contact__box__form__input">
-                <input type="text" name="name" id="name" placeholder="Imię"
-                    value="<?= $isLoggedIn ? htmlspecialchars($user['name']) : '' ?>"
-                    required>
-            </label>
-            <label for="surname" class="contact__box__form__input">
-                <input type="text" name="surname" id="surname" placeholder="Nazwisko"
-                    value="<?= $isLoggedIn ? htmlspecialchars($user['surname']) : '' ?>"
-                    required>
-            </label>
-            <label for="email" class="contact__box__form__input">
-                <input type="email" name="email" id="email" placeholder="Adres email"
-                    value="<?= $isLoggedIn ? htmlspecialchars($user['email']) : '' ?>"
-                    required>
-            </label>
-            <label for="telephone" class="contact__box__form__input">
-                <input type="text" name="telephone" id="telephone" placeholder="Numer telefonu"
-                    value="<?= $isLoggedIn ? htmlspecialchars($user['telephone']) : '' ?>">
-            </label>
-            <label for="content" class="contact__box__form__input__textarea">
-                <textarea name="content" id="content" placeholder="Wiadomość" required minlength="10"></textarea>
-            </label>
-            <button type="submit" class="dark">Wyślij wiadomość</button>
-        </form>
+        <?php if (isset($success)): ?>
+            <p>Twoja wiadomość została wysłana!.</p>
+        <?php else: ?>
+            <form action="submit" method="POST" autocomplete="off" class="contact__box__form">
+                <label for="firstName" class="contact__box__form__input">
+                    <input type="text" name="firstName" id="firstName" placeholder="Imię"
+                        value="<?= $isLoggedIn ? htmlspecialchars($user['firstName']) : '' ?>"
+                        required>
+                </label>
+                <label for="lastName" class="contact__box__form__input">
+                    <input type="text" name="lastName" id="lastName" placeholder="Nazwisko"
+                        value="<?= $isLoggedIn ? htmlspecialchars($user['lastName']) : '' ?>"
+                        required>
+                </label>
+                <label for="email" class="contact__box__form__input">
+                    <input type="email" name="email" id="email" placeholder="Adres email"
+                        value="<?= $isLoggedIn ? htmlspecialchars($user['email']) : '' ?>"
+                        required>
+                </label>
+                <label for="phone" class="contact__box__form__input">
+                    <input type="text" name="phone" id="phone" placeholder="Numer telefonu" value="<?= old('phone') ?>">
+                </label>
+                <label for="message" class="contact__box__form__input__textarea">
+                    <textarea name="message" id="message" placeholder="Wiadomość" required minlength="10">
+                        <?= old('message') ?>
+                    </textarea>
+                </label>
+                <button type="submit" class="dark">Wyślij wiadomość</button>
+            </form>
+        <?php endif; ?>
     </section>
 </article>

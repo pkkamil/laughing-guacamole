@@ -1,6 +1,5 @@
 <?php
 $title = "Katalog produktów";
-$lazy = true;
 $catalog = true;
 
 $products = [
