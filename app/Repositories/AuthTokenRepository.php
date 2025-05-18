@@ -5,7 +5,6 @@ namespace App\Repositories;
 use App\Interfaces\AuthTokenRepositoryInterface;
 use App\Repositories\Schemes\Repository;
 use App\Models\AuthToken;
-use PDO;
 
 class AuthTokenRepository extends Repository implements AuthTokenRepositoryInterface
 {
@@ -18,7 +17,7 @@ class AuthTokenRepository extends Repository implements AuthTokenRepositoryInter
             SELECT * FROM auth_tokens WHERE selector = :selector LIMIT 1
         ");
         $stmt->execute([':selector' => $selector]);
-        $token = $stmt->fetch(PDO::FETCH_ASSOC);
+        $token = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         return $token ? $this->mapToModel($token) : null;
     }
@@ -39,7 +38,7 @@ class AuthTokenRepository extends Repository implements AuthTokenRepositoryInter
         ]);
     }
 
-    public function deleteByUserId(int $userId): void
+    public function deleteByUserId(string $userId): void
     {
         $stmt = $this->database->prepare("
             DELETE FROM auth_tokens WHERE user_id = :user_id

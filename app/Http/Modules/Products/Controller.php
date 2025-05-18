@@ -2,21 +2,15 @@
 
 namespace App\Http\Modules\Products;
 
-// External dependencies
-use DateTime;
-
 use App\Http\Controllers\BaseController;
 
 use App\Http\Modules\Products\Requests\{
     CreateRequest,
     UpdateRequest
 };
-use App\Models\User;
 
 use App\Repositories\{
-    AuthTokenRepository,
     ProductRepository,
-    UserRepository
 };
 
 use App\Http\Modules\Products\Resources\ProductResource;
@@ -24,15 +18,11 @@ use App\Models\Product;
 
 class Controller extends BaseController
 {
-    private UserRepository $userRepository;
-    private AuthTokenRepository $authTokenRepository;
     private ProductRepository $productRepository;
 
     public function __construct()
     {
         parent::__construct();
-        $this->userRepository = new UserRepository();
-        $this->authTokenRepository = new AuthTokenRepository();
         $this->productRepository = new ProductRepository();
     }
 

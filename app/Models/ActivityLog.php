@@ -54,7 +54,6 @@ class ActivityLog extends MysqlModel
         $log->setUserId(isset($data['user_id']) ? (int)$data['user_id'] : null);
         $log->setAction($data['action'] ?? '');
 
-        // JSON może być null lub string, więc dekodujemy
         if (isset($data['metadata']) && !empty($data['metadata'])) {
             $decoded = json_decode($data['metadata'], true);
             $log->setMetadata($decoded !== null ? $decoded : null);

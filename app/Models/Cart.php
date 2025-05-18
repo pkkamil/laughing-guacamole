@@ -49,11 +49,11 @@ class Cart extends MysqlModel
     public static function fromArray(array $data): static
     {
         $cart = new static();
-        $cart->setId($data['id'] ?? '');
-        $cart->setCreatedAt($data['created_at'] ?? '');
-        $cart->setUpdatedAt($data['updated_at'] ?? '');
-        $cart->userId = isset($data['user_id']) ? (int)$data['user_id'] : null;
-        $cart->setStatus($data['status'] ?? self::STATUS_ACTIVE);
+        $cart->setId($data['id'] ?? $data[self::ID] ?? '');
+        $cart->setCreatedAt($data['created_at'] ?? $data[self::CREATED_AT] ?? '');
+        $cart->setUpdatedAt($data['updated_at'] ?? $data[self::UPDATED_AT] ?? '');
+        $cart->userId = $data['user_id'] ?? $data[self::USER_ID] ?? null;
+        $cart->setStatus($data['status'] ?? $data[self::STATUS] ?? self::STATUS_ACTIVE);
 
         return $cart;
     }

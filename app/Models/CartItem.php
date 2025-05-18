@@ -52,12 +52,12 @@ class CartItem extends MysqlModel
     public static function fromArray(array $data): static
     {
         $cartItem = new static();
-        $cartItem->setId($data['id'] ?? '');
-        $cartItem->setCreatedAt($data['created_at'] ?? '');
-        $cartItem->setUpdatedAt($data['updated_at'] ?? '');
-        $cartItem->setCartId((int)($data['cart_id'] ?? 0));
-        $cartItem->setProductId((int)($data['product_id'] ?? 0));
-        $cartItem->setQuantity((int)($data['quantity'] ?? 1));
+        $cartItem->setId($data['id'] ?? $data[self::ID] ?? '');
+        $cartItem->setCreatedAt($data['created_at'] ?? $data[self::CREATED_AT] ?? '');
+        $cartItem->setUpdatedAt($data['updated_at'] ?? $data[self::UPDATED_AT] ?? '');
+        $cartItem->setCartId($data['cart_id'] ?? $data[self::CART_ID] ?? 0);
+        $cartItem->setProductId($data['product_id'] ?? $data[self::PRODUCT_ID] ?? 0);
+        $cartItem->setQuantity((int)($data['quantity'] ?? $data[self::PRODUCT_ID] ?? 1));
 
         return $cartItem;
     }

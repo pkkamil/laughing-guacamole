@@ -117,12 +117,12 @@ class Controller extends BaseController
             return $this->render('/auth/forms/register');
         }
 
-        $user = new User(
-            email: $data['email'],
-            password: password_hash($data['password'], PASSWORD_DEFAULT),
-            firstName: $data['firstName'],
-            lastName: $data['lastName']
-        );
+        $user = User::fromArray([
+            User::EMAIL => $data['email'],
+            User::PASSWORD => password_hash($data['password'], PASSWORD_DEFAULT),
+            User::FIRST_NAME => $data['firstName'],
+            User::LAST_NAME => $data['lastName'],
+        ]);
 
         $this->userRepository->create($user);
 

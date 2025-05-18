@@ -4,25 +4,19 @@ namespace App\Http\Modules\Home;
 
 use App\Http\Controllers\BaseController;
 
-use App\Models\User;
-
 use App\Repositories\{
     ProductRepository,
-    UserRepository
 };
 
-use App\Http\Modules\Auth\Resources\UserResource;
 use App\Http\Modules\Products\Resources\ProductResource;
 
 class Controller extends BaseController
 {
-    private UserRepository $userRepository;
     private ProductRepository $productRepository;
 
     public function __construct()
     {
         parent::__construct();
-        $this->userRepository = new UserRepository();
         $this->productRepository = new ProductRepository();
     }
 
