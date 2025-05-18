@@ -4,7 +4,7 @@ namespace App\Http\Modules\Products\Requests;
 
 use App\Http\Requests\Request;
 
-class CreateRequest extends Request
+class UpdateRequest extends Request
 {
     protected array $input = [];
     protected array $files = [];

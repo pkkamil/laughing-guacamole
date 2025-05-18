@@ -14,41 +14,15 @@ class ActivityLogRepository extends Repository implements ActivityLogRepositoryI
     public function create(ActivityLog $log): void
     {
         $stmt = $this->database->prepare("
-            INSERT INTO {$this->table} (user_id, action, metadata, created_at)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO {$this->table} (id, user_id, action, metadata)
+            VALUES (?, ?, ?, ?, ?)
         ");
 
         $stmt->execute([
+            $log->generateUuid(),
             $log->getUserId(),
             $log->getAction(),
             $log->getMetadata() ? json_encode($log->getMetadata()) : null,
-            $log->getCreatedAt()
         ]);
-    }
-
-    public function update(ActivityLog $log): void
-    {
-        $stmt = $this->database->prepare("
-            UPDATE {$this->table} SET
-                user_id = ?,
-                action = ?,
-                metadata = ?,
-                created_at = ?
-            WHERE id = ?
-        ");
-
-        $stmt->execute([
-            $log->getUserId(),
-            $log->getAction(),
-            $log->getMetadata() ? json_encode($log->getMetadata()) : null,
-            $log->getCreatedAt(),
-            $log->getId()
-        ]);
-    }
-
-    public function delete(ActivityLog $log): void
-    {
-        $stmt = $this->database->prepare("DELETE FROM {$this->table} WHERE id = ?");
-        $stmt->execute([$log->getId()]);
     }
 }

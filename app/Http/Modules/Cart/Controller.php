@@ -22,7 +22,7 @@ class Controller extends BaseController
         $this->userRepository = new UserRepository();
     }
 
-    public function cart()
+    public function index()
     {
         $this->render('cart');
     }

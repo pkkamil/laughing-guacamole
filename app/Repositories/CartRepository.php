@@ -14,17 +14,18 @@ class CartRepository extends Repository implements CartRepositoryInterface
     public function create(Cart $cart): void
     {
         $stmt = $this->database->prepare("
-            INSERT INTO {$this->table} (user_id, status)
-            VALUES (?, ?)
+            INSERT INTO {$this->table} (id, user_id, status)
+            VALUES (?, ?, ?)
         ");
 
         $stmt->execute([
+            $cart->generateUuid(),
             $cart->getUserId(),
             $cart->getStatus()
         ]);
     }
 
-    public function update(Cart $cart): void
+    public function update(string $id, Cart $cart): void
     {
         $stmt = $this->database->prepare("
             UPDATE {$this->table} SET
@@ -36,13 +37,7 @@ class CartRepository extends Repository implements CartRepositoryInterface
         $stmt->execute([
             $cart->getUserId(),
             $cart->getStatus(),
-            $cart->getId()
+            $id
         ]);
-    }
-
-    public function delete(Cart $cart): void
-    {
-        $stmt = $this->database->prepare("DELETE FROM {$this->table} WHERE id = ?");
-        $stmt->execute([$cart->getId()]);
     }
 }

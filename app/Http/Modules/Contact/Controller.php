@@ -4,8 +4,6 @@ namespace App\Http\Modules\Contact;
 
 use App\Http\Controllers\BaseController;
 
-use App\Models\User;
-
 use App\Repositories\{
     ContactRepository,
     UserRepository
@@ -28,7 +26,7 @@ class Controller extends BaseController
         $this->contactRepository = new ContactRepository();
     }
 
-    public function contact()
+    public function index()
     {
         if (isset($_SESSION['user'])) {
             $user = $this->userRepository->findById($_SESSION['user']->getId());

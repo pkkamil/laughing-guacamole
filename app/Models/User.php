@@ -74,14 +74,14 @@ class User extends MysqlModel
     public static function fromArray(array $data): static
     {
         $user = new static();
-        $user->setId($data['id'] ?? '');
-        $user->setCreatedAt($data['created_at'] ?? '');
-        $user->setUpdatedAt($data['updated_at'] ?? '');
-        $user->email = $data['email'];
-        $user->password = $data['password'];
-        $user->firstName = $data['first_name'];
-        $user->lastName = $data['last_name'];
-        $user->setRole($data['role'] ?? self::ROLE_USER);
+        $user->setId($data['id'] ?? $data[self::ID] ?? '');
+        $user->setCreatedAt($data['created_at'] ?? $data[self::CREATED_AT] ?? '');
+        $user->setUpdatedAt($data['updated_at'] ?? $data[self::UPDATED_AT] ?? '');
+        $user->email = $data['email'] ?? $data[self::EMAIL];
+        $user->password = $data['password'] ?? $data[self::PASSWORD];
+        $user->firstName = $data['first_name'] ?? $data[self::FIRST_NAME];
+        $user->lastName = $data['last_name'] ?? $data[self::LAST_NAME];
+        $user->setRole($data['role'] ?? $data[self::ROLE] ?? self::ROLE_USER);
 
         return $user;
     }

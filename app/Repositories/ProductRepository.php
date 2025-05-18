@@ -14,11 +14,12 @@ class ProductRepository extends Repository implements ProductRepositoryInterface
     public function create(Product $product): void
     {
         $stmt = $this->database->prepare("
-            INSERT INTO {$this->table} (name, description, image_url, price, stock)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO {$this->table} (id, name, description, image_url, price, stock)
+            VALUES (?, ?, ?, ?, ?, ?)
         ");
 
         $stmt->execute([
+            $product->generateUuid(),
             $product->getName(),
             $product->getDescription(),
             $product->getImageUrl(),
@@ -27,7 +28,7 @@ class ProductRepository extends Repository implements ProductRepositoryInterface
         ]);
     }
 
-    public function update(Product $product): void
+    public function update(string $id, Product $product): void
     {
         $stmt = $this->database->prepare("
             UPDATE {$this->table} SET
@@ -45,13 +46,7 @@ class ProductRepository extends Repository implements ProductRepositoryInterface
             $product->getImageUrl(),
             $product->getPrice(),
             $product->getStock(),
-            $product->getId()
+            $id
         ]);
-    }
-
-    public function delete(Product $product): void
-    {
-        $stmt = $this->database->prepare("DELETE FROM {$this->table} WHERE id = ?");
-        $stmt->execute([$product->getId()]);
     }
 }

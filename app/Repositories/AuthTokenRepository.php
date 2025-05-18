@@ -26,35 +26,16 @@ class AuthTokenRepository extends Repository implements AuthTokenRepositoryInter
     public function create(AuthToken $authToken): void
     {
         $stmt = $this->database->prepare("
-            INSERT INTO {$this->table} (user_id, selector, hashed_validator, expires_at)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO {$this->table} (id, user_id, selector, hashed_validator, expires_at)
+            VALUES (?, ?, ?, ?, ?)
         ");
 
         $stmt->execute([
+            $authToken->generateUuid(),
             $authToken->getUserId(),
             $authToken->getSelector(),
             $authToken->getHashedValidator(),
             $authToken->getExpiresAt()
-        ]);
-    }
-
-    public function update(AuthToken $authToken): void
-    {
-        $stmt = $this->database->prepare("
-            UPDATE {$this->table} SET
-                user_id = ?,
-                selector = ?,
-                hashed_validator = ?,
-                expires_at = ?
-            WHERE id = ?
-        ");
-
-        $stmt->execute([
-            $authToken->getUserId(),
-            $authToken->getSelector(),
-            $authToken->getHashedValidator(),
-            $authToken->getExpiresAt(),
-            $authToken->getId()
         ]);
     }
 

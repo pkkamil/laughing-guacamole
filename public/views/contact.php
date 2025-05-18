@@ -17,7 +17,7 @@ function old($key)
         <?php if (isset($success)): ?>
             <p>Twoja wiadomość została wysłana!.</p>
         <?php else: ?>
-            <form action="submit" method="POST" autocomplete="off" class="contact__box__form">
+            <form action="/contact/submit" method="POST" autocomplete="off" class="contact__box__form">
                 <label for="firstName" class="contact__box__form__input">
                     <input type="text" name="firstName" id="firstName" placeholder="Imię"
                         value="<?= $isLoggedIn ? htmlspecialchars($user['firstName']) : '' ?>"
@@ -37,9 +37,7 @@ function old($key)
                     <input type="text" name="phone" id="phone" placeholder="Numer telefonu" value="<?= old('phone') ?>">
                 </label>
                 <label for="message" class="contact__box__form__input__textarea">
-                    <textarea name="message" id="message" placeholder="Wiadomość" required minlength="10">
-                        <?= old('message') ?>
-                    </textarea>
+                    <textarea name="message" id="message" placeholder="Wiadomość" required minlength="10"><?= old('message') ?></textarea>
                 </label>
                 <button type="submit" class="dark">Wyślij wiadomość</button>
             </form>

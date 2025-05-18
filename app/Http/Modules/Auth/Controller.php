@@ -16,6 +16,7 @@ use App\Models\User;
 
 use App\Repositories\{
     AuthTokenRepository,
+    ProductRepository,
     UserRepository
 };
 
@@ -36,14 +37,14 @@ class Controller extends BaseController
 
     public function login()
     {
-        if (!$this->isPost()) return $this->render('/auth/login');
+        if (!$this->isPost()) return $this->render('/auth/forms/login');
 
         $request = new LoginRequest($_POST);
 
         if ($request->fails()) {
             $_SESSION['errors'] = $request->errors();
             $_SESSION['old'] = $_POST;
-            return $this->render('/auth/login');
+            return $this->render('/auth/forms/login');
         }
 
         $data = $request->validated();
@@ -87,25 +88,24 @@ class Controller extends BaseController
             }
 
             header('Location: /account');
-            exit;
         }
 
         $_SESSION['errors'] = $errors;
         $_SESSION['old'] = $old;
 
-        return $this->render('/auth/login');
+        return $this->render('/auth/forms/login');
     }
 
     public function register()
     {
-        if (!$this->isPost()) return $this->render('/auth/register');
+        if (!$this->isPost()) return $this->render('/auth/forms/register');
 
         $request = new RegisterRequest($_POST);
 
         if ($request->fails()) {
             $_SESSION['errors'] = $request->errors();
             $_SESSION['old'] = $_POST;
-            return $this->render('/auth/register');
+            return $this->render('/auth/forms/register');
         }
 
         $data = $request->validated();
@@ -114,7 +114,7 @@ class Controller extends BaseController
         if ($existingUser) {
             $_SESSION['errors'] = ['email' => 'Użytkownik o tym adresie e-mail już istnieje.'];
             $_SESSION['old'] = $_POST;
-            return $this->render('/auth/register');
+            return $this->render('/auth/forms/register');
         }
 
         $user = new User(
@@ -126,8 +126,56 @@ class Controller extends BaseController
 
         $this->userRepository->create($user);
 
-        return $this->render('/auth/login', [
+        return $this->render('/auth/forms/login', [
             'messages' => ['Rejestracja zakończona sukcesem. Możesz się teraz zalogować.']
+        ]);
+    }
+
+    public function reset()
+    {
+        if (!$this->isPost()) return $this->render('/auth/forms/reset');
+
+        $request = new ResetRequest($_POST);
+
+        if ($request->fails()) {
+            $_SESSION['errors'] = $request->errors();
+            $_SESSION['old'] = $_POST;
+            return $this->render('/auth/forms/reset');
+        }
+
+        $data = $request->validated();
+        $user = $this->userRepository->getUsingEmail($data['email']);
+
+        if (!$user) {
+            $_SESSION['errors'] = ['email' => 'Nie znaleziono użytkownika o tym adresie e-mail.'];
+            $_SESSION['old'] = $_POST;
+            return $this->render('/auth/forms/reset');
+        }
+
+        // Generate reset token
+        $token = bin2hex(random_bytes(16));
+        $expires = (new DateTime('+1 hour'));
+
+        // Create auth token
+        $authToken = AuthToken::fromArray([
+            AuthToken::USER_ID => $user->getId(),
+            AuthToken::SELECTOR => $token,
+            AuthToken::HASHED_VALIDATOR => hash('sha256', $token),
+            AuthToken::EXPIRES_AT => $expires->format('Y-m-d H:i:s')
+        ]);
+
+        // Save token to the database
+        $this->authTokenRepository->create($authToken);
+
+        // Send email with reset link
+        $resetLink = "https://example.com/reset?token=$token";
+        $subject = "Resetowanie hasła";
+
+        $message = "Kliknij w poniższy link, aby zresetować hasło: $resetLink";
+        mail($data['email'], $subject, $message);
+
+        return $this->render('/auth/forms/reset', [
+            'messages' => ['Link do resetowania hasła został wysłany na podany adres e-mail.']
         ]);
     }
 
@@ -162,51 +210,41 @@ class Controller extends BaseController
         ]);
     }
 
-    public function reset()
+    public function admin()
     {
-        if (!$this->isPost()) return $this->render('/auth/passwords/reset');
-
-        $request = new ResetRequest($_POST);
-
-        if ($request->fails()) {
-            $_SESSION['errors'] = $request->errors();
-            $_SESSION['old'] = $_POST;
-            return $this->render('/auth/passwords/reset');
+        if (empty($_SESSION['user'])) {
+            header('Location: /login');
+            exit;
         }
 
-        $data = $request->validated();
-        $user = $this->userRepository->getUsingEmail($data['email']);
+        $user = $this->userRepository->findById($_SESSION['user']->getId());
 
-        if (!$user) {
-            $_SESSION['errors'] = ['email' => 'Nie znaleziono użytkownika o tym adresie e-mail.'];
-            $_SESSION['old'] = $_POST;
-            return $this->render('/auth/passwords/reset');
-        }
+        $productRepository = new ProductRepository();
+        $products = $productRepository->get();
 
-        // Generate reset token
-        $token = bin2hex(random_bytes(16));
-        $expires = (new DateTime('+1 hour'));
-
-        // Create auth token
-        $authToken = AuthToken::fromArray([
-            AuthToken::USER_ID => $user->getId(),
-            AuthToken::SELECTOR => $token,
-            AuthToken::HASHED_VALIDATOR => hash('sha256', $token),
-            AuthToken::EXPIRES_AT => $expires->format('Y-m-d H:i:s')
+        return $this->render('/auth/admin/index', [
+            'user' => (new UserResource($user))->toArray(),
+            'orders' => 0,
+            'products' => count($products),
         ]);
+    }
 
-        // Save token to the database
-        $this->authTokenRepository->create($authToken);
+    public function settings()
+    {
+        if (empty($_SESSION['user'])) {
+            header('Location: /login');
+            exit;
+        }
 
-        // Send email with reset link
-        $resetLink = "https://example.com/reset?token=$token";
-        $subject = "Resetowanie hasła";
+        $user = $this->userRepository->findById($_SESSION['user']->getId());
 
-        $message = "Kliknij w poniższy link, aby zresetować hasło: $resetLink";
-        mail($data['email'], $subject, $message);
-
-        return $this->render('/auth/passwords/reset', [
-            'messages' => ['Link do resetowania hasła został wysłany na podany adres e-mail.']
+        return $this->render('/auth/admin/settings', [
+            'user' => (new UserResource($user))->toArray(),
+            'settings' => [
+                'hero_image' => '/public/img/hero.jpg',
+                'welcome_box_text' => 'Przeglądaj wspaniałe produkty',
+                'welcome_box_button_text' => 'Przeglądaj',
+            ],
         ]);
     }
 }

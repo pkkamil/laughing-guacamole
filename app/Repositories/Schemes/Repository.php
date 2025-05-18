@@ -5,7 +5,7 @@ namespace App\Repositories\Schemes;
 // External dependencies
 use PDO;
 
-use App\Database;
+use App\DB;
 use App\Interfaces\RepositoryInterface;
 
 abstract class Repository implements RepositoryInterface
@@ -16,7 +16,16 @@ abstract class Repository implements RepositoryInterface
 
     public function __construct()
     {
-        $this->database = (new Database())->connect();
+        $this->database = (new DB())->connect();
+    }
+
+    public function get(): array
+    {
+        $stmt = $this->database->prepare("SELECT * FROM {$this->table}");
+        $stmt->execute();
+
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return array_map([$this, 'mapToModel'], $data);
     }
 
     public function findById(string $id): ?object
@@ -27,6 +36,12 @@ abstract class Repository implements RepositoryInterface
 
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
         return $data ? $this->mapToModel($data) : null;
+    }
+
+    public function delete(string $id): void
+    {
+        $stmt = $this->database->prepare("DELETE FROM {$this->table} WHERE id = ?");
+        $stmt->execute([$id]);
     }
 
     protected function mapToModel(array $data): object

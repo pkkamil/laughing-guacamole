@@ -14,11 +14,12 @@ class ContactRepository extends Repository implements ContactRepositoryInterface
     public function create(Contact $contact): void
     {
         $stmt = $this->database->prepare("
-            INSERT INTO {$this->table} (first_name, last_name, email, phone, message)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO {$this->table} (id, first_name, last_name, email, phone, message)
+            VALUES (?, ?, ?, ?, ?, ?)
         ");
 
         $stmt->execute([
+            $contact->generateUuid(),
             $contact->getFirstName(),
             $contact->getLastName(),
             $contact->getEmail(),
@@ -27,7 +28,7 @@ class ContactRepository extends Repository implements ContactRepositoryInterface
         ]);
     }
 
-    public function update(Contact $contact): void
+    public function update(string $id, Contact $contact): void
     {
         $stmt = $this->database->prepare("
             UPDATE {$this->table} SET
@@ -45,13 +46,7 @@ class ContactRepository extends Repository implements ContactRepositoryInterface
             $contact->getEmail(),
             $contact->getPhone(),
             $contact->getMessage(),
-            $contact->getId()
+            $id
         ]);
-    }
-
-    public function delete(Contact $contact): void
-    {
-        $stmt = $this->database->prepare("DELETE FROM {$this->table} WHERE id = ?");
-        $stmt->execute([$contact->getId()]);
     }
 }

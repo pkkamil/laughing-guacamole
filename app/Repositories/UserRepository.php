@@ -24,19 +24,21 @@ class UserRepository extends Repository implements UserRepositoryInterface
     public function create(User $user): void
     {
         $stmt = $this->database->prepare("
-            INSERT INTO {$this->table} (email, password, first_name, last_name)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO {$this->table} (id, email, password, first_name, last_name, role)
+            VALUES (?, ?, ?, ?, ?, ?)
         ");
 
         $stmt->execute([
+            $user->generateUuid(),
             $user->getEmail(),
             $user->getPassword(),
             $user->getFirstName(),
-            $user->getLastName()
+            $user->getLastName(),
+            $user->getRole()
         ]);
     }
 
-    public function update(User $user): void
+    public function update(string $id, User $user): void
     {
         $stmt = $this->database->prepare("
             UPDATE {$this->table} SET
@@ -54,13 +56,7 @@ class UserRepository extends Repository implements UserRepositoryInterface
             $user->getFirstName(),
             $user->getLastName(),
             $user->getRole(),
-            $user->getId()
+            $id
         ]);
-    }
-
-    public function delete(User $user): void
-    {
-        $stmt = $this->database->prepare("DELETE FROM {$this->table} WHERE id = ?");
-        $stmt->execute([$user->getId()]);
     }
 }

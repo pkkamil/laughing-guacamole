@@ -1,17 +1,17 @@
 <?php
-$title = $product->name;
+$title = $product['name'];
 $lazy = true;
 ?>
 
 <article class="product">
     <section class="product__content">
-        <img src="<?php echo $product->image; ?>" alt="">
+        <img src="<?php echo $product['imageUrl']; ?>" alt="">
         <section class="product__content__informations">
-            <h3><?php echo $product->name; ?></h3>
-            <span class="price"><?php echo $product->price; ?> <span class="grey">zł</span></span>
+            <h3><?php echo $product['name']; ?></h3>
+            <span class="price"><?php echo $product['price']; ?> <span class="grey">zł</span></span>
             <span class="small">Cena za 1 sztukę</span>
 
-            <?php if ($product->availability == 0): ?>
+            <?php if ($product['availability'] == 0): ?>
                 <form autocomplete="off">
                     <span>Ilość: 0</span>
                     <h4>Produkt niedostępny</h4>
@@ -30,9 +30,7 @@ $lazy = true;
             <?php endif; ?>
 
             <section class="product__content__informations__details">
-                <?php foreach (explode(',', $product->description) as $i): ?>
-                    <span><?php echo $i; ?></span>
-                <?php endforeach; ?>
+                <span><?php echo $product['description']; ?></span>
             </section>
         </section>
 
@@ -42,8 +40,8 @@ $lazy = true;
                 <span class="status">Dodano produkt do koszyka</span>
             </div>
             <div class="widget__product">
-                <img class="miniature" src="<?php echo $product->image; ?>" alt="">
-                <span><?php echo $product->name; ?></span>
+                <img class="miniature" src="<?php echo $product['imageUrl']; ?>" alt="">
+                <span><?php echo $product['name']; ?></span>
             </div>
             <a href="/cart" class="bright">Przejdź do koszyka</a>
             <a href="/order" class="button dark">Zamówienie</a>
@@ -107,7 +105,7 @@ $lazy = true;
         $.ajax('/api/add-to-cart', {
             type: 'POST',
             data: {
-                "product_id": "<?php echo $product->id; ?>",
+                "product_id": "<?php echo $product['id']; ?>",
                 "quantity": 1,
             },
             success: function(data, status, xhr) {
@@ -161,7 +159,7 @@ $lazy = true;
         $.ajax('/api/add-to-cart', {
             type: 'POST',
             data: {
-                "product_id": "<?php echo $product->id; ?>",
+                "product_id": "<?php echo $product['id']; ?>",
                 "quantity": 1,
             },
             success: function(data, status, xhr) {

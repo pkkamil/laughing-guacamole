@@ -14,18 +14,19 @@ class CartItemRepository extends Repository implements CartItemRepositoryInterfa
     public function create(CartItem $cartItem): void
     {
         $stmt = $this->database->prepare("
-            INSERT INTO {$this->table} (cart_id, product_id, quantity)
-            VALUES (?, ?, ?)
+            INSERT INTO {$this->table} (id, cart_id, product_id, quantity)
+            VALUES (?, ?, ?, ?)
         ");
 
         $stmt->execute([
+            $cartItem->generateUuid(),
             $cartItem->getCartId(),
             $cartItem->getProductId(),
             $cartItem->getQuantity()
         ]);
     }
 
-    public function update(CartItem $cartItem): void
+    public function update(string $id, CartItem $cartItem): void
     {
         $stmt = $this->database->prepare("
             UPDATE {$this->table} SET
@@ -39,13 +40,7 @@ class CartItemRepository extends Repository implements CartItemRepositoryInterfa
             $cartItem->getCartId(),
             $cartItem->getProductId(),
             $cartItem->getQuantity(),
-            $cartItem->getId()
+            $id
         ]);
-    }
-
-    public function delete(CartItem $cartItem): void
-    {
-        $stmt = $this->database->prepare("DELETE FROM {$this->table} WHERE id = ?");
-        $stmt->execute([$cartItem->getId()]);
     }
 }

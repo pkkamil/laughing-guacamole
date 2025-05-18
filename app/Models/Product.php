@@ -73,14 +73,14 @@ class Product extends MysqlModel
     public static function fromArray(array $data): static
     {
         $product = new static();
-        $product->setId($data['id'] ?? '');
-        $product->setCreatedAt($data['created_at'] ?? '');
-        $product->setUpdatedAt($data['updated_at'] ?? '');
-        $product->name = $data['name'];
-        $product->description = $data['description'] ?? null;
-        $product->imageUrl = $data['image_url'] ?? null;
-        $product->price = (float) $data['price'];
-        $product->stock = (int) $data['stock'];
+        $product->setId($data['id'] ?? $data[self::ID] ?? '');
+        $product->setCreatedAt($data['created_at'] ?? $data[self::CREATED_AT] ?? '');
+        $product->setUpdatedAt($data['updated_at'] ?? $data[self::UPDATED_AT] ?? '');
+        $product->name = $data['name'] ?? $data[self::NAME] ?? '';
+        $product->description = $data['description'] ?? $data[self::DESCRIPTION] ?? null;
+        $product->imageUrl = $data['image_url'] ?? $data[self::IMAGE_URL] ?? null;
+        $product->price = (float) $data['price'] ?? $data[self::PRICE] ?? 0.0;
+        $product->stock = (int) $data['stock'] ?? $data[self::STOCK] ?? 0;
 
         return $product;
     }
