@@ -7,7 +7,7 @@ use PDOException;
 
 require_once 'config.php';
 
-class Database
+class DB
 {
     private $username;
     private $password;

@@ -1,11 +1,14 @@
 <?php
 
+
 namespace App\Database;
+
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 // External dependencies
 use PDO;
 
-use App\Database;
+use App\DB;
 
 class Migrate
 {
@@ -14,8 +17,8 @@ class Migrate
 
     public function __construct(private array $argv)
     {
-        $this->db = (new Database())->connect();
-        $this->migrationsPath = __DIR__ . '/migrations';
+        $this->db = (new DB())->connect();
+        $this->migrationsPath = __DIR__ . '/Migrations';
     }
 
     public function run(): void
@@ -40,6 +43,7 @@ class Migrate
 
             if ($shouldFresh || !in_array($file, $existingMigrations)) {
                 echo "Running migration: $file\n";
+                $db = $this->db; 
                 require "{$this->migrationsPath}/$file";
 
                 $stmt = $this->db->prepare("INSERT INTO migrations (migration) VALUES (:migration)");
@@ -85,5 +89,4 @@ class Migrate
     }
 }
 
-// Usage example:
-// (new \App\Database\Migrate($argv))->run();
+(new \App\Database\Migrate($argv))->run();
