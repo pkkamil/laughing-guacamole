@@ -1,29 +1,9 @@
 <?php
-// Przykładowe dane koszyka (możesz je pobrać z bazy lub sesji)
-$cartItems = [
-    (object)[
-        'id' => 1,
-        'name' => 'Opony BRIDGESTONE Blizzak 205/55R16',
-        'image' => '/public/img/products/product2.jpg',
-        'link' => '/produkt/1',
-        'price' => 360.00,
-        'quantity' => 4,
-        'max' => 10,
-    ],
-    (object)[
-        'id' => 2,
-        'name' => 'Kierownica samochodowa',
-        'image' => '/public/img/products/product1.jpg',
-        'link' => '/produkt/2',
-        'price' => 324.00,
-        'quantity' => 1,
-        'max' => 5,
-    ]
-];
+$cartItems = $cart['cartItems'] ?? [];
 
 $total = 0;
 foreach ($cartItems as $item) {
-    $total += $item->price * $item->quantity;
+    $total += $item['price'] * $item['quantity'];
 }
 ?>
 
@@ -44,28 +24,36 @@ foreach ($cartItems as $item) {
 
                 <?php foreach ($cartItems as $item): ?>
                     <div class="td imgname">
-                        <a href="<?= htmlspecialchars($item->link) ?>">
-                            <img src="<?= htmlspecialchars($item->image) ?>" alt="">
+                        <a href="<?= htmlspecialchars($item['link']) ?>">
+                            <img src="<?= htmlspecialchars($item['image']) ?>" alt="">
                         </a>
                         <span>
-                            <a href="<?= htmlspecialchars($item->link) ?>"><?= htmlspecialchars($item->name) ?></a>
+                            <a href="<?= htmlspecialchars($item['link']) ?>"><?= htmlspecialchars($item['name']) ?></a>
                         </span>
                     </div>
                     <div class="td quantity">
                         <label for="items" class="product__content__informations__items">
-                            <i class="fas fa-minus" onclick="decrement(<?php echo $item->id ?>)"></i>
-                            <input type="number" name="items" id="items-<?php echo $item->id ?>" value="1" min="1" oninput="handleInput(<?php echo $item->id ?>)" onchange="handleChange(<?php echo $item->id ?>)">
-                            <i class="fas fa-plus" onclick="increment(<?php echo $item->id ?>)"></i>
+                            <i class="fas fa-minus" onclick="decrement('<?php echo $item['id'] ?>')"></i>
+                            <input
+                                type="number"
+                                name="items"
+                                id="items-<?= $item['id'] ?>"
+                                data-cart-item-id="<?= $item['id'] ?>"
+                                value="<?= $item['quantity'] ?>"
+                                min="1"
+                                oninput="handleInput('<?= $item['id'] ?>')"
+                                onchange="handleInput('<?= $item['id'] ?>')">
+                            <i class="fas fa-plus" onclick="increment('<?= $item['id'] ?>')"></i>
                         </label>
-                        <i class="far fa-trash-alt trash" onclick="remove(<?php echo $item->id ?>)"></i>
+                        <span class="trash-action"><i class="far fa-trash-alt trash" data-cart-item-id="<?= $item['id'] ?>"></i></span>
                     </div>
-                    <div class="td price"><?= number_format($item->price * $item->quantity, 2) ?> <span class="grey">zł</span></div>
+                    <div class="td price"><?= ($item['price'] * $item['quantity']) ?> <span class="grey">zł</span></div>
                 <?php endforeach; ?>
             </section>
 
             <section class="cart__content__summary">
                 <span class="grey">Łącznie</span>
-                <span class="price"><?= number_format($total, 2) ?> <p class="grey">zł</p></span>
+                <span class="price"><?= $total ?> <p class="grey">zł</p></span>
                 <span class="small">W cenie zawarto podatek VAT</span>
                 <!-- <a href="/order" class="button dark">Przejdź do zamówienia</a> TODO: Develop in future -->
             </section>
@@ -74,45 +62,139 @@ foreach ($cartItems as $item) {
 </article>
 
 <script>
-    let items = 1; // Example initial quantity, replace with actual value from the server
-    let quantity = 12; // Example maximum quantity, replace with actual value from the server
+    function updateQuantity(id, quantity) {
+        if (quantity < 1) quantity = 1;
+
+        fetch('/cart/updateQuantity', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `cartItemId=${id}&quantity=${quantity}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    refreshCart();
+                } else {
+                    alert(data.errors || 'Failed to update quantity.');
+                }
+            });
+    }
 
     function increment(id) {
-        if (items < quantity) {
-            items++;
-            updateInput(id);
-        }
+        const input = document.getElementById('items-' + id);
+        let quantity = parseInt(input.value) || 1;
+        quantity++;
+        input.value = quantity;
+        updateQuantity(id, quantity);
     }
 
     function decrement(id) {
-        if (items > 1) {
-            items--;
-            updateInput(id);
-        }
+        const input = document.getElementById('items-' + id);
+        let quantity = parseInt(input.value) || 1;
+        if (quantity > 1) quantity--;
+        input.value = quantity;
+        updateQuantity(id, quantity);
     }
 
     function handleInput(id) {
-        const input = document.getElementById('items');
-        items = parseInt(input.value) || 1;
-        if (items > quantity) {
-            items = quantity;
-            updateInput(id);
+        const input = document.getElementById('items-' + id);
+        let quantity = parseInt(input.value) || 1;
+        if (quantity < 1) quantity = 1;
+        updateQuantity(id, quantity);
+    }
+
+    function refreshCart() {
+        fetch('/cart/cartItems')
+            .then(res => res.text())
+            .then(text => {
+                try {
+                    const data = JSON.parse(text);
+                    if (data.status === 'success') renderCart(data.cartItems);
+                } catch (e) {
+                    console.error('Invalid JSON:', text);
+                }
+            });
+    }
+
+    function renderCart(items) {
+        if (!items || items.length === 0) {
+            location.reload();
         }
+
+        const cartContent = document.querySelector('.cart__content.not-empty');
+        const table = cartContent.querySelector('.table');
+        const summary = cartContent.querySelector('.cart__content__summary');
+
+        let html = `
+            <div class="th">Produkt</div>
+            <div class="th">Ilość</div>
+            <div class="th price">Wartość</div>
+        `;
+
+        let total = 0;
+
+        items.forEach(item => {
+            total += item.price * item.quantity;
+            html += `
+                <div class="td imgname">
+                    <a href="${item.link}">
+                        <img src="${item.image}" alt="">
+                    </a>
+                    <span>
+                        <a href="${item.link}">${item.name}</a>
+                    </span>
+                </div>
+                <div class="td quantity">
+                    <label class="product__content__informations__items">
+                        <i class="fas fa-minus" onclick="decrement('${item.id}')"></i>
+                        <input
+                            type="number"
+                            name="items"
+                            id="items-${item.id}"
+                            data-cart-item-id="${item.id}"
+                            value="${item.quantity}"
+                            min="1"
+                            oninput="handleInput('${item.id}')"
+                            onchange="handleInput('${item.id}')">
+                        <i class="fas fa-plus" onclick="increment('${item.id}')"></i>
+                    </label>
+                    <span class="trash-action"><i class="far fa-trash-alt trash" data-cart-item-id="${item.id}"></i></span>
+                </div>
+                <div class="td price">${(item.price * item.quantity).toFixed(2)} <span class="grey">zł</span></div>
+            `;
+        });
+
+        table.innerHTML = html;
+        summary.querySelector('.price').innerHTML = `${total.toFixed(2)} <p class="grey">zł</p>`;
+
+        attachTrashEvents();
     }
 
-    function handleChange(id) {
-        if (items < 1) {
-            items = 1;
-            updateInput(id);
-        }
+    function attachTrashEvents() {
+        document.querySelectorAll('.trash-action').forEach(icon => {
+            icon.onclick = () => {
+                const id = icon.querySelector('.trash').dataset.cartItemId;
+                fetch('/cart/removeFromCart', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `cartItemId=${id}`
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            refreshCart();
+                        } else {
+                            alert(data.errors || 'Failed to remove the product.');
+                        }
+                    });
+            };
+        });
     }
 
-    function updateInput(id) {
-        document.getElementById('items-' + id).value = items;
-    }
-
-    function remove(id) {
-        // Implement the logic to remove the item from the cart
-        console.log('Remove item with ID:', id);
-    }
+    // Attach trash events on page load
+    attachTrashEvents();
 </script>

@@ -54,7 +54,7 @@ $lazy = true;
 
 <script>
     let items = 1;
-    let quantity = 12;
+    let quantity = <?php echo $product['stock']; ?>;
 
     function increment() {
         if (items < quantity) {
@@ -102,11 +102,11 @@ $lazy = true;
     // POST
     document.querySelector('.product__content__informations form button').addEventListener('click', (e) => {
         e.preventDefault()
-        $.ajax('/api/add-to-cart', {
+        $.ajax('/cart/addToCart', {
             type: 'POST',
             data: {
-                "product_id": "<?php echo $product['id']; ?>",
-                "quantity": 1,
+                "productId": "<?php echo $product['id']; ?>",
+                quantity: parseInt(document.getElementById('items').value) || 1,
             },
             success: function(data, status, xhr) {
                 document.querySelector('.widget__upper .icon').classList.remove('fa-check')
@@ -156,11 +156,11 @@ $lazy = true;
 
     document.querySelector('.product__content__informations form .buy_now').addEventListener('click', (e) => {
         e.preventDefault()
-        $.ajax('/api/add-to-cart', {
+        $.ajax('/cart/addToCart', {
             type: 'POST',
             data: {
-                "product_id": "<?php echo $product['id']; ?>",
-                "quantity": 1,
+                "productId": "<?php echo $product['id']; ?>",
+                quantity: parseInt(document.getElementById('items').value) || 1,
             },
             success: function(data, status, xhr) {
                 document.querySelector('.widget__upper .icon').classList.remove('fa-check')
