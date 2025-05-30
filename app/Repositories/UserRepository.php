@@ -23,19 +23,21 @@ class UserRepository extends Repository implements UserRepositoryInterface
 
     public function create(User $user): void
     {
-        $stmt = $this->database->prepare("
-            INSERT INTO {$this->table} (id, email, password, first_name, last_name, role)
+        $this->transaction(function (self $repo) use ($user) {
+            $stmt = $repo->database->prepare("
+            INSERT INTO {$repo->table} (id, email, password, first_name, last_name, role)
             VALUES (?, ?, ?, ?, ?, ?)
         ");
 
-        $stmt->execute([
-            $user->generateUuid(),
-            $user->getEmail(),
-            $user->getPassword(),
-            $user->getFirstName(),
-            $user->getLastName(),
-            $user->getRole()
-        ]);
+            $stmt->execute([
+                $user->generateUuid(),
+                $user->getEmail(),
+                $user->getPassword(),
+                $user->getFirstName(),
+                $user->getLastName(),
+                $user->getRole()
+            ]);
+        });
     }
 
     public function update(string $id, User $user): void

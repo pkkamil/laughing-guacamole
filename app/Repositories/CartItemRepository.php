@@ -11,6 +11,27 @@ class CartItemRepository extends Repository implements CartItemRepositoryInterfa
     protected string $table = CartItem::TABLE_NAME;
     protected string $modelClass = CartItem::class;
 
+    public function findByCartId(string $cartId): array
+    {
+        $stmt = $this->database->prepare("SELECT * FROM {$this->table} WHERE cart_id = :cart_id");
+        $stmt->bindParam(':cart_id', $cartId, \PDO::PARAM_STR);
+        $stmt->execute();
+
+        $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return array_map([$this, 'mapToModel'], $data);
+    }
+
+    public function findByCartIdAndProductId(string $cartId, string $productId): ?CartItem
+    {
+        $stmt = $this->database->prepare("SELECT * FROM {$this->table} WHERE cart_id = :cart_id AND product_id = :product_id");
+        $stmt->bindParam(':cart_id', $cartId, \PDO::PARAM_STR);
+        $stmt->bindParam(':product_id', $productId, \PDO::PARAM_STR);
+        $stmt->execute();
+
+        $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $data ? $this->mapToModel($data) : null;
+    }
+
     public function create(CartItem $cartItem): void
     {
         $stmt = $this->database->prepare("

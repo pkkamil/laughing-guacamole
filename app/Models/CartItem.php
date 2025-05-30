@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use App\Models\Schemes\MysqlModel;
+use App\Repositories\ProductRepository;
 
 class CartItem extends MysqlModel
 {
-    private int $cartId;
-    private int $productId;
+    private string $cartId;
+    private string $productId;
     private int $quantity;
 
     public const TABLE_NAME = 'cart_items';
@@ -16,22 +17,22 @@ class CartItem extends MysqlModel
     public const PRODUCT_ID = 'productId';
     public const QUANTITY = 'quantity';
 
-    public function getCartId(): int
+    public function getCartId(): string
     {
         return $this->{self::CART_ID};
     }
 
-    public function setCartId(int $cartId): void
+    public function setCartId(string $cartId): void
     {
         $this->{self::CART_ID} = $cartId;
     }
 
-    public function getProductId(): int
+    public function getProductId(): string
     {
         return $this->{self::PRODUCT_ID};
     }
 
-    public function setProductId(int $productId): void
+    public function setProductId(string $productId): void
     {
         $this->{self::PRODUCT_ID} = $productId;
     }
@@ -47,6 +48,17 @@ class CartItem extends MysqlModel
             throw new \InvalidArgumentException('Quantity must be greater than zero.');
         }
         $this->{self::QUANTITY} = $quantity;
+    }
+
+    /*
+    ** RELATIONS
+    */
+    public function getProduct(): ?Product
+    {
+        if ($this->getProductId() === null) return null;
+
+        $repository = new ProductRepository();
+        return $repository->findById($this->getProductId());
     }
 
     public static function fromArray(array $data): static

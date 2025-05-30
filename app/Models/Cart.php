@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use App\Models\Schemes\MysqlModel;
+use App\Repositories\CartItemRepository;
 
 class Cart extends MysqlModel
 {
-    private ?int $userId = null;
+    private ?string $userId = null;
     private string $status;
 
     public const TABLE_NAME = 'carts';
@@ -18,12 +19,13 @@ class Cart extends MysqlModel
     public const STATUS_COMPLETED = 'completed';
     public const STATUS_CANCELLED = 'cancelled';
 
-    public function getUserId(): ?int
+
+    public function getUserId(): ?string
     {
         return $this->{self::USER_ID};
     }
 
-    public function setUserId(?int $userId): void
+    public function setUserId(?string $userId): void
     {
         $this->{self::USER_ID} = $userId;
     }
@@ -44,6 +46,17 @@ class Cart extends MysqlModel
             throw new \InvalidArgumentException('Invalid cart status');
         }
         $this->{self::STATUS} = $status;
+    }
+
+    /*
+    ** RELATIONS
+    */
+    public function getItems(): array
+    {
+        if ($this->getId() === null) return [];
+
+        $repository = new CartItemRepository();
+        return $repository->findByCartId($this->getId());
     }
 
     public static function fromArray(array $data): static

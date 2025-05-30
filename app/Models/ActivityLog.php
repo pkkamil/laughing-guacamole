@@ -6,7 +6,7 @@ use App\Models\Schemes\MysqlModel;
 
 class ActivityLog extends MysqlModel
 {
-    private ?int $userId;
+    private ?string $userId;
     private string $action;
     private ?array $metadata;
 
@@ -16,12 +16,12 @@ class ActivityLog extends MysqlModel
     public const ACTION = 'action';
     public const METADATA = 'metadata';
 
-    public function getUserId(): ?int
+    public function getUserId(): ?string
     {
         return $this->{self::USER_ID};
     }
 
-    public function setUserId(?int $userId): void
+    public function setUserId(?string $userId): void
     {
         $this->{self::USER_ID} = $userId;
     }

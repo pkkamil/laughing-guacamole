@@ -49,4 +49,9 @@ class ProductRepository extends Repository implements ProductRepositoryInterface
             $id
         ]);
     }
+
+    public function countAvaiable(): int
+    {
+        return (int) $this->database->query("SELECT count_available_products()")->fetchColumn();
+    }
 }

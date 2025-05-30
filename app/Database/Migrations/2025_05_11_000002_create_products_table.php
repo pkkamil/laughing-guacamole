@@ -12,3 +12,13 @@ $db->exec("
         stock INT NOT NULL DEFAULT 0
     );
 ");
+
+$db->exec("
+    CREATE FUNCTION count_available_products()
+    RETURNS INT
+    BEGIN
+        DECLARE total INT;
+        SELECT COUNT(*) INTO total FROM products WHERE stock > 0;
+        RETURN total;
+    END;
+");

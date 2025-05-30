@@ -6,7 +6,7 @@ use App\Models\Schemes\MysqlModel;
 
 class AuthToken extends MysqlModel
 {
-    private int $userId;
+    private string $userId;
     private string $selector;
     private string $hashedValidator;
     private string $expiresAt;
@@ -18,12 +18,12 @@ class AuthToken extends MysqlModel
     public const HASHED_VALIDATOR = 'hashedValidator';
     public const EXPIRES_AT = 'expiresAt';
 
-    public function getUserId(): int
+    public function getUserId(): string
     {
         return $this->{self::USER_ID};
     }
 
-    public function setUserId(int $userId): void
+    public function setUserId(string $userId): void
     {
         $this->{self::USER_ID} = $userId;
     }

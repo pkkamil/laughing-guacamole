@@ -26,11 +26,16 @@ Router::get('/catalog', [\App\Http\Modules\Products\Controller::class, 'catalog'
 Router::get('/products/{id}', [\App\Http\Modules\Products\Controller::class, 'single']);
 Router::get('/contact', [\App\Http\Modules\Contact\Controller::class, 'index']);
 Router::post('/contact/submit', [\App\Http\Modules\Contact\Controller::class, 'submit']);
-Router::get('/cart', [\App\Http\Modules\Cart\Controller::class, 'index']);
 
 // Logged routes
 Router::group(['middleware' => LoggedMiddleware::class], function () {
     Router::get('/account', [\App\Http\Modules\Auth\Controller::class, 'account']);
+
+    Router::get('/cart', [\App\Http\Modules\Cart\Controller::class, 'index']);
+    Router::post('/cart/addToCart', [\App\Http\Modules\Cart\Controller::class, 'addToCart']);
+    Router::post('/cart/removeFromCart', [\App\Http\Modules\Cart\Controller::class, 'removeFromCart']);
+    Router::post('/cart/updateQuantity', [\App\Http\Modules\Cart\Controller::class, 'updateQuantity']);
+    Router::get('/cart/cartItems', [\App\Http\Modules\Cart\Controller::class, 'getCartItems']);
 
     Router::group(['middleware' => AdminMiddleware::class], function () {
         Router::get('/admin', [\App\Http\Modules\Auth\Controller::class, 'admin']);

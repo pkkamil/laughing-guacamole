@@ -6,6 +6,7 @@ use App\Models\Cart;
 
 interface CartRepositoryInterface
 {
-    public function create(Cart $cart): void;
-    public function update(string $id, Cart $cart): void;
+    public function findByUserId(string $userId): ?Cart;
+    public function create(Cart $cart): Cart;
+    public function update(string $id, Cart $cart): Cart;
 }

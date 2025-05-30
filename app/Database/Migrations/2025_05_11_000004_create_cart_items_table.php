@@ -9,6 +9,6 @@ $db->exec("
         product_id CHAR(36),
         quantity INT NOT NULL CHECK (quantity > 0),
         FOREIGN KEY (cart_id) REFERENCES carts(id) ON DELETE CASCADE,
-        FOREIGN KEY (product_id) REFERENCES products(id)
+        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
     );
 ");
