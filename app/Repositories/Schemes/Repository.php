@@ -44,6 +44,19 @@ abstract class Repository implements RepositoryInterface
         $stmt->execute([$id]);
     }
 
+    public function transaction(callable $callback)
+    {
+        try {
+            $this->database->beginTransaction();
+            $result = $callback($this);
+            $this->database->commit();
+            return $result;
+        } catch (\Throwable $e) {
+            $this->database->rollBack();
+            throw $e;
+        }
+    }
+
     protected function mapToModel(array $data): object
     {
         $modelClass = $this->modelClass;
