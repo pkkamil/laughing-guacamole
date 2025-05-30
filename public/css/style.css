@@ -870,17 +870,17 @@ footer a {
     width: 100px;
 }
 
-.cart__content .table span:not(.grey) {
+.cart__content .table span:not(.grey):not(.trash-action) {
     font-weight: lighter;
     margin-left: 20px;
 }
 
-.cart__content .table span:not(.grey) a {
+.cart__content .table span:not(.grey):not(.trash-action) a {
     color: #555;
     text-decoration: none;
 }
 
-.cart__content .table span:not(.grey) a:hover {
+.cart__content .table span:not(.grey):not(.trash-action) a:hover {
     text-decoration: underline;
 }
 
@@ -1044,14 +1044,14 @@ footer a {
     box-shadow: 0px 0px 4px 0px #42445a;
 }
 
-.account__content__bottom__orders__list__single span:not(.grey) {
+.account__content__bottom__orders__list__single span:not(.grey):not(.trash-action) {
     color: #777;
     display: block;
     font-weight: lighter;
     margin-bottom: 5px;
 }
 
-.account__content__bottom__orders__list__single span:not(.grey) b {
+.account__content__bottom__orders__list__single span:not(.grey):not(.trash-action) b {
     font-weight: 400;
     color: #333;
 }
@@ -1934,7 +1934,7 @@ footer a {
         width: 220px;
     }
 
-    .cart__content .table span:not(.grey) {
+    .cart__content .table span:not(.grey):not(.trash-action) {
         margin-left: 20px;
         padding-right: 50px;
     }
@@ -2143,7 +2143,7 @@ footer a {
         width: 80px;
     }
 
-    .cart__content .table span:not(.grey) {
+    .cart__content .table span:not(.grey):not(.trash-action) {
         margin-left: 15px;
         padding-right: 30px;
     }
@@ -2445,7 +2445,7 @@ footer a {
         width: 60px;
     }
 
-    .cart__content .table span:not(.grey) {
+    .cart__content .table span:not(.grey):not(.trash-action) {
         padding-right: 20px;
         display: -webkit-box;
         -webkit-line-clamp: 3;
@@ -2824,7 +2824,7 @@ footer a {
         width: 50px;
     }
 
-    .cart__content .table span:not(.grey) {
+    .cart__content .table span:not(.grey):not(.trash-action) {
         padding-right: 15px;
     }
 
