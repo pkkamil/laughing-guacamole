@@ -43,6 +43,9 @@ This is a modern e-commerce store built with plain PHP 8.3, MariaDB, and Nginx u
 └── vendor # Dependencies (such as autoload.php)
 ```
 
+## 🪧 Digram ERD
+![alt text](image.png)
+
 ## ⚙️ Getting Started
 
 ### Prerequisites
