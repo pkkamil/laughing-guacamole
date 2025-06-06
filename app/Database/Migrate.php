@@ -27,6 +27,7 @@ class Migrate
 
         if ($shouldFresh) {
             $this->dropAllTables();
+            $this->dropAllFunctions();
         }
 
         $this->createMigrationsTable();
@@ -43,7 +44,7 @@ class Migrate
 
             if ($shouldFresh || !in_array($file, $existingMigrations)) {
                 echo "Running migration: $file\n";
-                $db = $this->db; 
+                $db = $this->db;
                 require "{$this->migrationsPath}/$file";
 
                 $stmt = $this->db->prepare("INSERT INTO migrations (migration) VALUES (:migration)");
@@ -72,6 +73,19 @@ class Migrate
 
         $this->db->exec("SET FOREIGN_KEY_CHECKS = 1");
         echo "All tables dropped.\n";
+    }
+
+    private function dropAllFunctions(): void
+    {
+        echo "Dropping all functions...\n";
+        $functions = $this->db->query("SHOW FUNCTION STATUS")->fetchAll();
+
+        foreach ($functions as $function) {
+            $this->db->exec("DROP FUNCTION IF EXISTS `{$function['Name']}`");
+            echo "Dropped function: {$function['Name']}\n";
+        }
+
+        echo "All functions dropped.\n";
     }
 
     private function createMigrationsTable(): void
