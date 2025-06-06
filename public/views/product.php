@@ -101,6 +101,13 @@ $lazy = true;
 
     // POST
     document.querySelector('.product__content__informations form button').addEventListener('click', (e) => {
+        // If user is not logged in, redirect to login page
+        if (!<?php echo isset($_SESSION['user']) ? 'true' : 'false'; ?>) {
+            e.preventDefault();
+            window.location.href = '/login';
+            return;
+        }
+
         e.preventDefault()
         $.ajax('/cart/addToCart', {
             type: 'POST',
