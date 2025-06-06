@@ -24,7 +24,7 @@ $addresses = $addresses ?? [];
 
         <div class="account__content__bottom">
             <?php if (count($orders) > 0): ?>
-                <!-- TODO: DODANIA KOMPONENTU ZAMÓWIEŃ -->
+                <!-- TODO: Add order history component -->
             <?php else: ?>
                 <div class="account__content__bottom__orders">
                     <h4>Historia zamówień</h4>
@@ -37,7 +37,7 @@ $addresses = $addresses ?? [];
                 <h4>Informacje o koncie</h4>
 
                 <?php if (count($addresses) === 0): ?>
-                    <a href="/addresses"><i class="fas fa-home"></i> Twoje adresy (0)</a>
+                    <a><i class="fas fa-home"></i> Twoje adresy (0)</a>
                 <?php else: ?>
                     <?php $addr = $addresses[0]; ?>
                     <div class="account__content__bottom__informations__default">
