@@ -44,7 +44,7 @@ This is a modern e-commerce store built with plain PHP 8.3, MariaDB, and Nginx u
 ```
 
 ## 🪧 Digram ERD
-![alt text](image.png)
+![ERD](diagram_ERD.png)
 
 ## ⚙️ Getting Started
 
