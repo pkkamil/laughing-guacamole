@@ -66,7 +66,7 @@ docker-compose up --build -d
 docker exec -it laughing-guacamole-php-1 sh 
 
 # Run migrations and seeders
-php app/Database/Migrate.php #In case you want to refresh the database add --fresh flag
+php app/Database/Migrate.php # In case you want to refresh the database add --fresh flag
 php app/Database/DatabaseSeeder.php
 ```
 ## 🧪 Testing
