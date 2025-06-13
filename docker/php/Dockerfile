@@ -11,6 +11,8 @@ RUN apk add --no-cache --virtual .build-deps $BUILD_DEPS \
 
 RUN apk add --no-cache --virtual .run-deps $RUN_DEPS
 
+RUN echo "memory_limit = -1" > /usr/local/etc/php/conf.d/memory-limit.ini
+
 COPY . /var/www/html
 
 VOLUME ["/var/www/html"]
