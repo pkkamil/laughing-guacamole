@@ -59,15 +59,4 @@ $title = "Edycja produktu o ID " . htmlspecialchars($product['id']);
     </section>
 </article>
 
-<script>
-    const preview = document.getElementById('preview');
-    const imageInput = document.getElementById('image');
-
-    imageInput.addEventListener("change", function(event) {
-        const file = event.target.files[0];
-        if (file) {
-            preview.src = URL.createObjectURL(file);
-            preview.style.display = 'block';
-        }
-    });
-</script>
+<script src="/public/js/product-form.js"></script>

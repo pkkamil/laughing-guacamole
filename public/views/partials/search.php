@@ -10,19 +10,5 @@
         </div>
     </section>
 </article>
-<script>
-    document.querySelector('.navbar__content__icons__search').addEventListener('click', (e) => {
-        document.querySelector('.search').style.display = 'block'
-        document.querySelector('.search__bar__content__input input').focus()
-    })
 
-    document.querySelector('.navbar--mobile__links__single--search').addEventListener('click', (e) => {
-        document.querySelector('.search').style.display = 'block'
-        document.querySelector('.search__bar__content__input input').focus()
-    })
-
-    document.addEventListener('mouseup', (e) => {
-        if (!document.querySelector('.search__bar').contains(e.target))
-            document.querySelector('.search').style.display = 'none'
-    })
-</script>
+<script src="/public/js/search.js"></script>

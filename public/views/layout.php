@@ -45,15 +45,8 @@
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
     <?php include_once __DIR__ . '/partials/search.php'; ?>
 
-
     <?php if (isset($lazy)): ?>
         <div class="loader-wrapper"></div>
-        </div>
-        <script>
-            $(window).on("load", function() {
-                $(".loader-wrapper").delay(200).fadeOut(700);
-            });
-        </script>
     <?php endif; ?>
 
     <div class="container">
